@@ -1,0 +1,558 @@
+Hibernate framework:
+````
+hibernate is a java framework that simplifies the development of 
+java application to interact with the database.
+
+
+It is an open source, lightweight,orm(object relational mapping) tool.
+
+
+jdbc (specifications) -> different database vendors
+
+jpa(java persistence api) -specification -> sunmicrosystem(orm specification)
+
+ ->Hibernate implements the specifications of JPA(java persistence api)
+   for data persistence.
+   
+   
+   
+orm tool:
+``
+it simplifies the data creation,
+data manipulation
+
+& data access.
+
+->it is  a programming technique that maps the object
+to the data stored in the database.
+
+
+note:
+The orm tool internally uses the jdbc api to interact with the database.
+
+what is jpa:
+``
+java persistnace api is a java specification that provides certain
+funcationality and standard to orm tools.
+
+javax.persistence package contains the jpa classes and interfaces.
+
+
+advantages of hibernate framework:
+
+ 1.open source and lightweight
+ 2.fast performance(cache)
+ 3.database independent query(hql)-hibernate query language
+ 4.automatic table creation
+ 5.simplifies complex join
+ 6.provides query statistics and database status.
+ 
+ 
+ Hibernate architecture:
+ ````
+ it includes many objects such as persistent object,
+ 
+ session factory,
+ 
+ transaction factory
+ connection factory
+ session
+ transaction ...
+ 
+    -java application layer
+	
+	-hibernate framework layer
+	
+	-backend api layer
+	
+	-database layer
+	
+	
+1.create the persistent class.
+
+2.create the configuration file(hibernate.cfg.xml)
+
+3.create the class that retrieves or stores the persistent object.
+
+
+
+mvn install:install-file -Dfile=path/to/your/ojdbc6.jar -DgroupId=com.oracle 
+    -DartifactId=ojdbc6 -Dversion=11.2.0.4 -Dpackaging=jar
+	
+	
+	https://www.onlinetutorialspoint.com/hibernate/hbm2ddl-auto-example-hibernate-xml-config.html
+	
+for maven installation and setting the path:
+```````
+
+	
+	https://www.javatpoint.com/how-to-install-maven
+	
+	
+
+hibernate.cfg.xml:
+```
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- JDBC Database connection settings -->
+        <property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+        <property name="connection.url">jdbc:oracle:thin:@localhost:1521:xe</property>
+        <property name="connection.username">capg</property>
+        <property name="connection.password">capg</property>
+        <!-- JDBC connection pool settings ... using built-in test pool -->
+        <property name="connection.pool_size">1</property>
+        <!-- Select our SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.OracleDialect</property>
+        <!-- Echo the SQL to stdout -->
+        <property name="show_sql">true</property>
+        
+        <property name="hbm2ddl.auto">update</property>
+        
+        <property name="hibernate.current_session_context_class">thread</property>
+     
+        <mapping class="com.capg.entity.Student" />
+    </session-factory>
+</hibernate-configuration>
+
+
+Entity Class:
+````
+package com.capg.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="student")
+public class Student {
+	
+	@Id
+	@Column(name="id")
+	private int id;
+	
+	@Column(name="first_name")
+	private String firstName;
+	
+	@Column(name="last_name")
+	private String lastName;
+	
+	@Column(name="email")
+	private String email;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public Student(String firstName, String lastName, String email) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+	}
+
+	@Override
+	public String toString() {
+		return "Student [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email + "]";
+	}
+	
+  
+}
+
+
+CreateStudentDemo.java:
+```
+package com.capg.main;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+import com.capg.entity.Student;
+
+public class CreateStudentDemo {
+
+	
+	public static void main(String[] args) {
+		
+		
+		//create the sessionfactory object
+		
+		SessionFactory factory = 
+				new Configuration()
+				.configure("hibernate.cfg.xml")
+				.addAnnotatedClass(Student.class)
+				.buildSessionFactory();
+		
+		//create the session object
+		
+		Session session = factory.getCurrentSession();
+		
+		Student tempStudent = new Student("ram","capg","ramcapg@gmail.com");
+		
+		session.beginTransaction();
+		session.save(tempStudent);
+		
+		//commit the transaction
+		session.getTransaction().commit();
+		
+		//close 
+		factory.close();
+
+	
+	}
+		
+}
+
+
+pom.xml:
+``
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.capg.orm</groupId>
+  <artifactId>hibernate-demo</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>hibernate-demo</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    
+    
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+	
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-core</artifactId>
+    <version>5.4.1.Final</version>
+</dependency>
+
+<dependency>
+  <groupId>oracle</groupId>
+  <artifactId>oracle-jdbc</artifactId>
+  <version>6</version>
+
+</dependency>
+
+    
+  </dependencies>
+</project>
+
+
+
+
+
+
+
+
+conn as sysdba
+
+username: system
+password: system
+
+
+sql:/>ALTER USER system IDENTIFIED BY system;
+
+username: system
+password: system
+
+
+try to open in browser and connect it by providing username as system
+and password as system.
+
+
+create the workspace with the existing user.
+
+
+
+package com.capg.entity;
+
+import java.util.Date;
+
+import javax.annotation.Generated;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.GenericGenerator;
+
+@Entity
+@Table(name = "student")
+public class Student {
+
+	@Id
+	//@GeneratedValue(strategy = GenerationType.AUTO)
+	
+	
+	@GenericGenerator(name="stu_id",strategy = "com.capg.main.CustomIdGen")
+	
+	
+	@GeneratedValue(generator = "stu_id")
+	
+	
+	@Column(name = "id")
+	private String id;
+
+	@Column(name = "first_name")
+	private String firstName;
+
+	@Column(name = "last_name")
+	private String lastName;
+
+	@Column(name = "email")
+	private String email;
+
+	@Temporal(value= TemporalType.DATE)
+	@Column(name = "dob")
+	private Date dob;
+
+	public Date getDob() {
+		return dob;
+	}
+
+	public void setDob(Date dob) {
+		this.dob = dob;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public Student(String firstName, String lastName, String email, Date dob) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.dob = dob;
+	}
+
+	@Override
+	public String toString() {
+		return "Student [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", dob=" + dob + "]";
+	}
+
+	public Student() {
+
+	}
+}
+
+
+StudentInsert.java:
+````
+package com.capg.main;
+
+import java.util.Date;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+import com.capg.entity.Student;
+
+public class StudentInsert {
+	
+	public static void main(String[] args) {
+		
+		
+		SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Student.class).buildSessionFactory();
+		
+		Session session = factory.getCurrentSession();
+		
+		
+		session.beginTransaction();
+		
+		//Student st = new Student("ram","capg","rk@gmail.com",new Date());
+		
+		Student stu = (Student)session.get(Student.class,"stu_72");
+		
+		System.out.println(stu.getDob());
+		
+		
+		session.getTransaction().commit();
+	}
+
+}
+
+ so far we worked with custom generators and worked with date fields.
+ 
+ 
+CustomGen.java:
+````
+
+package com.capg.main;
+
+import java.io.Serializable;
+import java.util.Random;
+
+import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.id.IdentifierGenerator;
+
+public class CustomIdGen implements IdentifierGenerator {
+
+
+
+@Override
+public Serializable generate(SharedSessionContractImplementor session, Object object) throws HibernateException {
+	
+	Random random = new Random();
+
+	return "stu_"+random.nextInt(78);
+}
+
+}
+
+assignment:
+`
+Create an app using Hibernate to read/write data to database table. Here is the database table design:
+
+Table: Employee
+
+Columns
+- first_name : varchar
+- last_name: varchar
+- company : varchar
+
+
+Steps You Must Complete 
+
+Create the database table.
+Set up the Hibernate configuration file.
+Create a Java class (entity) with Hibernate annotations.
+Develop a main application.
+Develop code to save objects.
+Develop code to retrieve an object by primary key.
+Develop code to query objects to find employees for a given company.
+Develop code to delete an object by primary key.
+
+
+example:
+`````
+package com.capg.main;
+
+import java.util.List;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+import com.capg.entity.Student;
+
+public class ListStudents {
+
+	public static void main(String[] args) {
+		
+		
+SessionFactory factory = new Configuration().configure("hibernate.cfg.xml").addAnnotatedClass(Student.class).buildSessionFactory();
+		
+		Session session = factory.getCurrentSession();
+		
+		session.beginTransaction();
+		/*
+		 * List<Student> students =
+		 * session.createQuery("from Student s where s.lastName='capg2'").getResultList(
+		 * );
+		 * 
+		 * for(Student st: students) { System.out.println(st); }
+		 */
+		
+		/*update
+		 * Student stu = (Student)session.get(Student.class,"stu_72");
+		 * 
+		 * stu.setFirstName("ram1");
+		 * 
+		 * session.update(stu);
+		 */
+		
+		//session.createQuery("update student set lastName='capg3' where id='stu_29'").executeUpdate();
+		System.out.println("required changes updated");
+		
+		session.getTransaction().commit();
+		
+		
+		
+	}
+}

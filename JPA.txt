@@ -1,0 +1,809 @@
+
+layerd architecture process:
+----------------------------
+from the client will call service method(EmployeeService service= new EmployeeServiceImpl();)->
+
+from service method will call dao method(EmployeeDao dao= new EmployeeDaoImpl())->
+from dao will call database entity manager methods(entityManager )
+
+
+JPA:
+====
+JAVA PERSISTANCE API
+jpa is a framework
+jpa is a specification
+jpa internally uses jdbc
+java application to jdbc
+
+
+disadv of jdbc:
+===========
+alwys concentrate on querys
+every java file has only one database
+we need to learn all querys
+we are close connnection manually
+we have to handle all checked execptions
+
+
+
+
+
+jpa is extension of jdbc
+
+hibernate,toplink, eclipslink............
+
+ORM tool implementation
+jpa  specification with hibernate  implemnetaion 
+
+
+hibernate is ORM tool,
+
+ORM (OBJECT RELATIONAL MAPPING)
+ the communication b/wn java aplication to databse in the form of "objects".
+    it is going to map with database in the form of objects.
+
+JPA example:
+-------------
+
+1.Entity class /model class
+    the class which is like a table(becomming as table)=the class which is database table
+	
+	
+2.Test/client
+       main method class(we execute here)
+	   
+3.configuration class
+       jpa need to connect with database
+	                  we have to provide database info in the configuration file
+							   configuration file is called "persistnace.xml"
+                                                                    (xtensioble  markup language)
+
+
+
+       like   @ override, @fuctinalInterface like....alredy use annotaions.
+we are going to use annotations
+@Entity, @Id, @column
+
+@Entity, @Id these two are mandetory remaing all optional;
+
+
+*by using @Entity annotation above the class we can create table, that table name
+is as class name in java file
+*@Id primery key added to the id column
+
+
+* if you want change coulmn name add @column annotaion add new name to the coulmn
+      
+	  @column (name="eid")
+   private int empId
+
+@column (name="ename,length=15")
+   private int empName
+
+*we can generate id's automatically by using "@GenerateValue"
+       starts with 1 ,increment with 1
+	   
+
+we have 4 entity methods:
+=======================
+persist()----->save(inserting)
+
+merge()-------->updating
+
+remove()----------->deleting
+
+find()--------->fetch data
+
+=> To insert the records in employee class:
+---------------------------------------------
+=>here we use persist() method to insert the records.
+=>here we are doing "dml" commands thats why we need to do commit explicitly thats why we are
+using getTransaction,begin,commit methods for explicit commit.
+   
+       Employee emp=new Employee(123,"sathya",12000,"hyd");  //	ORM  //param constructor
+		
+		entity.getTransaction().begin();
+		
+		entity.persist(emp);   //dml--commit
+		
+		entity.getTransaction().commit();
+		
+   
+    
+=> To Update the records in employee class:
+----------------------------------------------
+*here we are goint to use merge() method but before going to update we need to fetch the data from 
+  the table.
+        * fetching data from table
+		   entity.find();
+		   
+		   //to fetch the reccords and updating the objects
+		
+//above find method we provide entity class,and passing empid(124) it will fetch from the Employee 
+//in this employye it will hit the database by passing 124  fetch the data and return into emp.
+		
+		Employee emp=entity.find(Employee.class, 124); 
+		         System.out.println(emp);
+		//for update we have to us eset methods
+		         emp.setEmpName("soma");
+		         emp.setEmpSal(25000);
+		         emp.setEmpAdd("punjab");
+		         
+		         //if i want change in datatbase we call merge methd to update
+		        entity.getTransaction().begin();
+		         entity.merge(emp);  // it is dmll we need to commit
+		  entity.getTransaction().commit();
+
+=>To remove object from the table:
+=================================
+remove() methode.
+=>if we want remove method 1st we need to get after that we can remove.
+=> i want remove 124
+
+           Employee emp=entity.find(Employee.class, 124); 
+		         System.out.println(emp);
+		
+		         
+		        entity.getTransaction().begin();
+		         entity.remove(emp);  // it is dmll we need to commit
+		  entity.getTransaction().commit();
+
+
+TO select all employeees from the table:
+--------------------------------------
+select * from employee is not possible by jpa find() method.
+find() method can fetch only one record from  the table
+
+**By using createQuery we can fetch all employees
+
+  TypedQuery<Employee> result= entity.createQuery("select e from Employee e",Employee.class);
+		
+	       List<Employee> li = result.getResultList();
+		//by using iterartoe we can iterate
+	      Iterator<Employee> itr =li.iterator();
+	      while(itr.hasNext())
+	      {
+	    	  System.out.println(itr.next());
+	      }
+		  
+		  
+		  
+		  
+		  
+		  
+		
+corejavalevel example:
+======================
+with in one pacakge we have to create below classes
+ pacakgename:com.cg.example
+         *entity
+          *client
+
+  with in the "src" we have to create one folder"META-INF" with in that xml config file we create
+           *configuration(xml)
+
+
+Entity:
+-------
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
+public class Employee {
+	@Id
+	private int empId;
+	private String empName;
+	private int empSal;
+	private String empAdd;
+
+	public int getEmpId() {
+		return empId;
+	}
+
+	public void setEmpId(int empId) {
+		this.empId = empId;
+	}
+	
+	public String getEmpName() {
+		return empName;
+	}
+	
+	public void setEmpName(String empName) {
+		this.empName = empName;
+	}
+
+	public int getEmpSal() {
+		return empSal;
+	}
+	
+	public void setEmpSal(int empSal) {
+		this.empSal = empSal;
+	}
+	
+	public String getEmpAdd() {
+		return empAdd;
+	}
+	
+	public void setEmpAdd(String empAdd) {
+		this.empAdd = empAdd;
+	}
+	
+	public Employee(int empId, String empName, int empSal, String empAdd) {
+		super();
+		this.empId = empId;
+		this.empName = empName;
+		this.empSal = empSal;
+		this.empAdd = empAdd;
+	}
+	
+	@Override
+	public String toString() {
+		return "Employee [empId=" + empId + ", empName=" + empName + ", empSal=" + empSal + ", empAdd=" + empAdd + "]";
+	}
+	
+	public Employee() {
+		
+		
+		
+	}
+}
+
+
+Client:
+------
+import java.util.Iterator;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
+
+public class Clent {
+	public static void main(String[] args) {
+		
+		EntityManagerFactory factory=Persistence.createEntityManagerFactory("jpaex");
+		
+		EntityManager entity =factory.createEntityManager();
+
+		// persist, remove,merge,find,getTransaction,                          creatQuery
+		
+		// we are writing our own querys by using "JPQL" we use any database here no problem it take any database
+		
+	          
+		
+	//=======================JPA normal query, program basic=======================	
+		//==1==save
+		
+//		Employee emp=new Employee(124,"ragini",36000,"delhi");  //	ORM  //param constructor
+//		
+//		entity.getTransaction().begin();
+//		
+//		entity.persist(emp);   //dml--commit
+//		
+//		entity.getTransaction().commit();
+		
+		
+		
+		  //to update==2====
+		
+	      //Employee emp=entity.find(Employee.class, 124); //get single employee
+//		         System.out.println(emp);
+		//for update we have to us eset methods
+//		         emp.setEmpName("soma");
+//		         emp.setEmpSal(25000);
+//		         emp.setEmpAdd("punjab");
+//		         
+//		         //=====>if i want change in datatbase we call merge methd to" update"<=======
+	      
+//		        entity.getTransaction().begin();
+//		         entity.merge(emp);  // it is dmll we need to commit
+//		          entity.getTransaction().commit(); 
+		
+		//to ==3==remove the object from the table
+		
+//		Employee emp=entity.find(Employee.class, 124); 
+//             System.out.println(emp);
+//		
+//             entity.getTransaction().begin();
+//	         entity.remove(emp);  // it is dmll we need to commit
+//	         entity.getTransaction().commit(); 
+//	
+		
+		//to fetch the reccords and updating the objects
+		
+//above find method we provide entity class,and passing empid(124) it will fetch from the Employee 
+//in this employye it will hit the database by passing 124  fetch the data and return into emp.
+//		
+	      
+	    
+		
+	
+		//crud operations
+		
+		//persist()-->to save(insert)   merge()-->update  remove()--to delete  get/find()--->to fetch
+		
+		
+		
+		
+		  TypedQuery<Employee> result= entity.createQuery("select e from Employee e",Employee.class);
+			
+	       List<Employee> li = result.getResultList();
+		//by using iterator we can iterate
+	      Iterator<Employee> itr =li.iterator();
+	      while(itr.hasNext())
+	      {
+	    	  System.out.println(itr.next());
+	      }
+		
+//		
+	}
+
+}
+
+
+config file:
+------------
+<?xml version="1.0" encoding="UTF-8"?>
+
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+                      http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+  version="2.0">
+	<persistence-unit name="jpaex" transaction-type="RESOURCE_LOCAL">
+		
+		<properties>
+		<!--  db properties-->
+			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost/sathya" />
+			<property name="javax.persistence.jdbc.user" value="postgres" />
+			<property name="javax.persistence.jdbc.password" value="postgres" />
+			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
+			
+			<!-- hibernate property -->
+			
+			<!-- three properties we used : dialect class, show_sql hbm2ddl-auto -->
+			
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>	
+			<property name="hibernate.hbm2ddl.auto" value="update"/>	<!-- create update -->
+			<property name="hibernate.show_sql" value="true"/>	
+		</properties>
+	</persistence-unit>
+</persistence>
+
+
+
+jpql:
+=====
+
+select eid, ename from sleeping(table name) where salary>10000; //postgres
+
+select empId,empName from Employee(classname) where esal>10000; //JPQL 
+
+
+
+
+
+if we write one query in jpql, we can use any database.
+
+JPQL"::::  by using jpql querys:
+===============================
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+public class TestClient {
+
+ public static void main(String[] args) {
+
+ EntityManagerFactory emf = Persistence.createEntityManagerFactory("sleeping");
+EntityManager em = emf.createEntityManager();
+em.getTransaction().begin();
+//insert
+
+// Employee e = new Employee(123, "suresh", 10000);
+// Employee e1 = new Employee(124, "naresh", 20000);
+// Employee e2 = new Employee(125, "ramesh", 30000);
+// Employee e3 = new Employee(126, "suresh", 40000);
+// em.persist(e);
+// em.persist(e1);
+// em.persist(e2);
+// em.persist(e3);//find()-1 record,JPQL
+
+//fetch select * from capemp123;
+
+// TypedQuery<Employee> q2 = em.createQuery("select c from Employee c",Employee.class);
+// List<Employee> l1 = q2.getResultList();
+//
+// for (Employee e1 : l1) {
+// System.out.println(e1.getEid());
+// System.out.println(e1.getEname());// ...all
+// System.out.println(e1.getEsal());
+// }
+/*
+* merge(employee) Query q1 = em.createQuery("select c from Employee c");
+*
+* List<Employee> l = q1.getResultList(); for (Employee e : l) {
+* System.out.print(e.getEid()); System.out.print("\t" + e.getEname());
+* System.out.print("\t" + e.getEsal()); System.out.println(); }
+*/
+
+ // update
+
+// Query q = em.createQuery("update Employee set esal=esal+5000 where esal<50000");
+// q.executeUpdate();
+
+ // delete
+
+// Query q2 = em.createQuery("delete from Employee where esal>30000");
+// q2.executeUpdate();
+//
+Query query = em.createQuery("select MAX(emp.esal) FROM Employee emp");
+int maxsal = (int) query.getSingleResult();
+System.out.println(maxsal);
+
+ em.getTransaction().commit();
+System.out.println("inserted");
+em.close();
+emf.close();
+
+ }
+}
+
+PERSISTANCE LIFE CYCLE
+layerd architecture with jpa crud
+
+RELATIONASHIPS
+One To One(uni, Bi)
+One To Many
+Many To One
+Many To Many(uni,Bi)
+
+INHERITANCE CONCEPTS
+
+
+
+
+example jpa:
+-----------------
+
+package com.rj.demo;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="empj")
+public class Employee {
+
+	@Id
+	@Column(name="eid" ,length=6)
+	private int empid;
+	@Column(name="ename", length=15)
+	private String empname;
+	private int empsal;
+	private String empadd;
+	
+	public int getEmpid() {
+		return empid;
+	}
+	public void setEmpid(int empid) {
+		this.empid = empid;
+	}
+	public String getEmpname() {
+		return empname;
+	}
+	public void setEmpname(String empname) {
+		this.empname = empname;
+	}
+	public int getEmpsal() {
+		return empsal;
+	}
+	public void setEmpsal(int empsal) {
+		this.empsal = empsal;
+	}
+	public String getEmpadd() {
+		return empadd;
+	}
+	public void setEmpadd(String empadd) {
+		this.empadd = empadd;
+	}
+	
+	public Employee() {
+		// TODO Auto-generated constructor stub
+	}
+	public Employee(int empid, String empname, int empsal, String empadd) {
+		super();
+		this.empid = empid;
+		this.empname = empname;
+		this.empsal = empsal;
+		this.empadd = empadd;
+	}
+	@Override
+	public String toString() {
+		return "Employee [empid=" + empid + ", empname=" + empname + ", empsal=" + empsal + ", empadd=" + empadd + "]";
+	}
+	
+}
+
+
+
+
+Test:
+------
+
+package com.rj.demo;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
+public class Test {
+	public static void main(String[] args) {
+
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("jayesh");
+
+		EntityManager entity = factory.createEntityManager();
+
+//persist()->to save , merge()-->to update find()-->search,  remove()-to delete
+
+//Employee emp= new Employee(123, "jayesh", 78000, "usa");
+
+		entity.getTransaction().begin();
+//entity.persist(emp);
+		Employee emp1 = entity.find(Employee.class, 123);
+
+		emp1.setEmpname("sathya");
+		emp1.setEmpsal(1000);
+
+		entity.merge(emp1);
+		entity.getTransaction().commit();
+
+		entity.close();
+		factory.close();
+
+	}
+}
+
+
+
+
+configu;et:
+------------
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+                      http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+  version="2.0">
+  
+	<persistence-unit name="jayesh" transaction-type="RESOURCE_LOCAL">
+	
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		
+		<class>com.rj.demo.Employee</class>
+
+		<properties>
+		<!-- database properties -->
+			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:XE" />
+			<property name="javax.persistence.jdbc.user" value="jayesh" />
+			<property name="javax.persistence.jdbc.password" value="jayesh123" />
+			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.driver.OracleDriver" />
+			
+			<!-- hibernate properties -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.OracleDialect"/>
+			<property name="hibernate.hbm2ddl.auto" value="update"/><!-- create/update  -->
+			<property name="hibernate.show_sql" value="true"/>
+		</properties>
+		
+	</persistence-unit>
+	
+</persistence>
+
+
+
+
+
+jpql:
+------------------------
+
+
+cleint:
+-----
+
+
+package com.kt.jpqlex;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+public class Client {
+	public static void main(String[] args) {
+
+		EntityManagerFactory factory = Persistence.createEntityManagerFactory("jpqlex");
+
+		EntityManager entity = factory.createEntityManager();
+
+		entity.getTransaction().begin();
+
+//inserted
+////	
+//	Employee e= new Employee(100, "dIVYA", 10000, "KNL");
+//	Employee e1= new Employee(101, "TARUN", 12000, "KURNOOL");
+//	Employee e2= new Employee(102, "SATHYA", 13000, "HYD");
+//	Employee e3= new Employee(103, "MAHESH", 14000, "KMPL");
+////	
+//	entity.persist(e);
+//	entity.persist(e1);
+//	entity.persist(e2);
+//	entity.persist(e3);
+
+		// createQuery()--fetch, executeUpdate()--->to update, executeUpdate()--->to
+		// delete
+
+//fetch   select * from employeejpql ;
+
+//	
+//	TypedQuery<Employee> tq=entity.createQuery("select e from Employee e", Employee.class);
+//	
+//	List<Employee> li=tq.getResultList();
+//			
+//	for(Employee s:li) 
+//	{
+//		
+//		System.out.println(s.getEmpId());
+//		System.out.println(s.getEmpName());
+//		System.out.println(s.getEmpSal());
+//		
+//	}
+
+//update	
+//
+//Query result=entity.createQuery("update Employee set empSal= empSal+50000 where empSal>10000");
+//          
+//              result.executeUpdate();
+
+//delete
+//         
+		Query result = entity.createQuery("delete from  Employee where empSal>10000");
+		result.executeUpdate();
+
+//select
+
+//	           Query result=entity.createQuery("select MAX(e.empSal) FROM Employee e");
+//	           
+//	                   int maxsal= (int) result.getSingleResult();
+//	                   
+//	                   System.out.println(maxsal);
+
+		entity.getTransaction().commit();
+
+		entity.close();
+		factory.close();
+		System.out.println("inserted");
+
+	}
+
+}
+
+
+employee:
+---------
+
+package com.kt.jpqlex;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="employeejpql")
+public class Employee {
+    @Id
+	private int empId;
+    @Column(length=15)
+	private String empName;
+    @Column(name="employeesalary")//database columname
+	private int empSal;//employee class property
+	  @Column(length=15)
+	private String empAdd;
+	public int getEmpId() {
+		return empId;
+	}
+	public void setEmpId(int empId) {
+		this.empId = empId;
+	}
+	public String getEmpName() {
+		return empName;
+	}
+	public void setEmpName(String empName) {
+		this.empName = empName;
+	}
+	public int getEmpSal() {
+		return empSal;
+	}
+	public void setEmpSal(int empSal) {
+		this.empSal = empSal;
+	}
+	public String getEmpAdd() {
+		return empAdd;
+	}
+	public void setEmpAdd(String empAdd) {
+		this.empAdd = empAdd;
+	}
+	
+	public Employee() {
+		// TODO Auto-generated constructor stub
+	}
+	public Employee(int empId, String empName, int empSal, String empAdd) {
+		super();
+		this.empId = empId;
+		this.empName = empName;
+		this.empSal = empSal;
+		this.empAdd = empAdd;
+	}
+	@Override
+	public String toString() {
+		return "Employee [empId=" + empId + ", empName=" + empName + ", empSal=" + empSal + ", empAdd=" + empAdd + "]";
+	}
+	
+	
+}
+
+
+
+config:
+--------->
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+                      http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+  version="2.0">
+  
+  
+	<persistence-unit name="priyanka" transaction-type="RESOURCE_LOCAL">
+	
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		
+		<class>com.jpql.Employee</class>
+
+		<properties>
+		<!-- database properties -->
+			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@localhost:1521:XE" />
+			<property name="javax.persistence.jdbc.user" value="priyanka" />
+			<property name="javax.persistence.jdbc.password" value="priyanka123" />
+			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.driver.OracleDriver" />
+			
+			<!-- hibernate properties -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.OracleDialect"/>
+			<property name="hibernate.hbm2ddl.auto" value="update"/><!-- create/update  -->
+			<property name="hibernate.show_sql" value="true"/>
+		</properties>
+		
+	</persistence-unit>
+	
+</persistence>
+
+
+

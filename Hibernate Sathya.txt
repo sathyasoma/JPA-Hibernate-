@@ -1,0 +1,119 @@
+Need of hibernate:
+===================
+Hibernate is used to overcome the limitations of JDBC like:
+       
+	 * JDBC code is dependent on the database software being used i.e our persistence logic dependent
+becase of using jdbc.
+     *Here we are inserting a record into Employee table but our quey is database software dependent,
+i.e here we are using MySql. but if we change our database then thisquery wont work.
+
+     * if working with jdbc,changing of database suddenly is costly.
+	 * jdbc code is not portable across the multiple database software.
+	 * In jdbc Exception handling is mandetory.
+	 * while working with jdbc, there is no support for object level relationship.
+	 * In jdbc there occurs a boilerplate code problem, for every project we have to write that 
+code, bcz of that code length is increasing.
+     
+	 *To overcome those problems we are using "ORM" tool ,i.e nothing but HIbernate Framework.
+	      By using hibernate we can avoid above all problems and we can enjoy some other additional
+set of functionalities.
+
+
+About Hibernate:
+=================
+   Hibernate is a framework that provides "abstraction layer", 
+     internally it provide implementation for 
+	         Establishing connection with the database 
+			            writing the query to perform for CRUD operations
+			 
+persistence logic: To store and process the data for long use.
+==================
+
+Hibernate is opensource,non-invasive,light weight java ORM(Object relational Mapping ) framework 
+to develop objects which are independentof the database software and make independent logic in 
+all JAVA,JEE.
+
+Functionalities supported by Hibernate;
+======================================
+=>hibernate framework support for "AUTO DDL" operations.
+            in jdbc we have to write the query ,crete and declare table in jdbc
+                But hibernate can do all opertaions internally table creationa and alter and drop table.
+
+=>Hibernate can support for"AUTO Primary Key" generation
+       But IN Jdbc we have to write the key
+=>Hibernate framework is "database independent" it support "HQL"(hibernate query langauge) not 
+specific to any database.
+      But Jdbc is dependent database.
+=>In hibernate is exception handling is not mandetory
+      BUt In jdbc is mandetory
+=>Hibernate is "ORM" tool means it support object relational mapping.
+    But jdbc not dealing with objects, it delaing with values which are primitive 
+=>In hibernate each record represented as object
+      But in jdbc each record represent with values(primitive data)
+=>Hibernate support "Cache memory".
+     But jdbc not support.				  
+
+
+Hibernate:
+============
+hibernate is framework it is used to develope persistence logic which is independent on database 
+software.
+
+Configuration:
+===============
+configuration is a class which is present in org.hibernate.cfg.package. It "activates" the hibernate
+framework. It reads both configuration and mapping files.
+
+
+SessionFactory:
+================
+SessionFactory is an "interface" it os used to create "session" object.
+
+ SessionFactory factory=cfg.buildsessionFactory(	);
+Session:
+=========
+Session is an inteface.
+   session object is cretaed based on the sessionfactory object i.e factory.
+   
+ Session session = factory.buildSession();
+ 
+=>it opens the connection and/ session with database throgth hibenate framework.
+=>session object is used to perrform CRUD operations.
+
+
+Transaction:
+=============
+Transaction is the object whenever we perform some oprations , based on the t operation there is 
+some changes in "database".
+
+Query:
+=========
+Query is na interface
+    A Query instance obtained by the calling "session.createQuery()"
+ 
+      Query query=session.createQuery();
+
+
+	  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
